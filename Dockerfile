@@ -1,29 +1,30 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:2.1 AS build
+# =========================
+# 1. Build Stage
+# =========================
+FROM mcr.microsoft.com/dotnet/core/sdk:2.0 AS build
 WORKDIR /src
 
-# Copy project file and restore dependencies
+# Copy csproj and restore dependencies
 COPY ["hello-world-api/hello-world-api.csproj", "hello-world-api/"]
 RUN dotnet restore "hello-world-api/hello-world-api.csproj"
 
-# Copy all source files
+# Copy the rest of the source code
 COPY . .
 
-# Publish application
+# Publish the app (Release configuration)
 RUN dotnet publish "hello-world-api/hello-world-api.csproj" -c Release -o /app/publish
 
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:2.1 AS runtime
+# =========================
+# 2. Runtime Stage
+# =========================
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.0 AS runtime
 WORKDIR /app
 
-# Copy published files from build stage
+# Copy published app from build stage
 COPY --from=build /app/publish .
 
-# Ensure the app listens on all network interfaces
-ENV ASPNETCORE_URLS=http://+:80
+# Expose port your app listens on
+EXPOSE 9090
 
-# Expose port 80
-EXPOSE 80
-
-# Run the application
+# Run the app
 ENTRYPOINT ["dotnet", "hello-world-api.dll"]
