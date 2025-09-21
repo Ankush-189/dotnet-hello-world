@@ -19,6 +19,11 @@ WORKDIR /app
 # Copy published files from build stage
 COPY --from=build /app/publish .
 
-# Expose port and set entrypoint
+# Ensure the app listens on all network interfaces
+ENV ASPNETCORE_URLS=http://+:80
+
+# Expose port 80
 EXPOSE 80
+
+# Run the application
 ENTRYPOINT ["dotnet", "hello-world-api.dll"]
