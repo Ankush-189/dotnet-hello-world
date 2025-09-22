@@ -25,5 +25,9 @@ ENV ASPNETCORE_URLS=http://+:80
 # Expose port 80
 EXPOSE 80
 
+# Add healthcheck (verifies app responds on port 80)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD curl --fail http://localhost:80/ || exit 1
+
 # Run the application
 ENTRYPOINT ["dotnet", "hello-world-api.dll"]
